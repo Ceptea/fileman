@@ -12,9 +12,8 @@ try:
     isthemeable = 1
 except ImportError:
     import tkinter.ttk as ttk
+
     isthemeable = 0
-    
-    
 
 
 def file_type(file):
@@ -30,6 +29,7 @@ class APP:
         self.files = tk.Listbox()
         self.context = tk.Menu(tearoff=0)
         self.context.add_command(label="Open", command=self.open_file)
+        self.context.add_command(label="Edit", command=self.edit_file)
         self.context.add_command(label="New file", command=self.new_file)
         self.context.add_command(label="New folder", command=self.new_folder)
         self.context.add_command(label="Delete", command=self.delete_file)
@@ -65,6 +65,11 @@ class APP:
                 pass
             self.refresh()
 
+    def edit_file(self):
+        file = self.get_file()
+        if os.path.isfile(file):
+            self.run_file(file, f"{text_editor} {file}", 0)
+
     def new_folder(self):
         new_folder = simpledialog.askstring(title="fileman", prompt="Create a folder.")
         if new_folder:
@@ -73,35 +78,59 @@ class APP:
 
     def delete_file(self):
         file = self.get_file()
-        answer = tkmsg.askyesno("fileman", f"Are you sure you want to delete {file}")
-        if answer:
-            if os.path.isdir(file):
-                os.rmdir(file)
-            else:
-                os.remove(file)
+        if file == '..':
+            return -1
+        if os.path.exists(file):
+            answer = tkmsg.askyesno("fileman", f"Are you sure you want to delete {file}")
+            if answer:
+                if os.path.isdir(file):
+                    os.rmdir(file)
+                else:
+                    os.remove(file)
+        else:
+            self.refresh()
+
+    def run_file(self, file, cmd, confirm=1):
+        file = self.get_file()
+        if confirm:
+            answer = tkmsg.askyesno(
+                "fileman", f"Are you sure you want to execute {file}"
+            )
+            if answer:
+                sb.Popen(cmd, shell=1)
+        else:
+            sb.Popen(cmd, shell=1)
 
     def open_file(self, event=""):
         file = self.get_file()
+        if not file:
+            return 0
         if file == "..":
             os.chdir("..")
         match file_type(file):
             case ".txt":
-                sb.Popen(f"{text_editor} {file}", shell=1)
+                self.run_file(file, f"{text_editor} {file}", 0)
             case ".py":
-                sb.Popen(f"{terminal} python3 {file}", shell=1)
+                self.run_file(file, f"{terminal} {python} ./{file}")
             case ".pye":
-                sb.Popen(f"{terminal} ./{file}", shell=1)
+                self.run_file(file, f"{terminal} ./{file}")
             case ".sh":
-                sb.Popen(f"{terminal} ./{file}", shell=1)
+                self.run_file(file, f"{terminal} ./{file}")
             case _:
-                sb.Popen(f"xdg-open {file}", shell=1)
+                if os.access(file, os.X_OK):
+                    self.run_file(file, f"{terminal} ./{file}")
+                else:
+                    sb.Popen(f"xdg-open {file}", shell=1)
         self.refresh()
 
     def get_file(self):
-        file = self.files.curselection()
-        file = self.files.get(file)
-        file = str(file)
-        return file
+        try:
+            file = self.files.curselection()
+            file = self.files.get(file)
+            file = str(file)
+            return file
+        except:
+            return 0
 
     def doubleclick(self, event):
         file = self.files.curselection()
