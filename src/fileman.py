@@ -78,10 +78,12 @@ class APP:
 
     def delete_file(self):
         file = self.get_file()
-        if file == '..':
+        if file == "..":
             return -1
         if os.path.exists(file):
-            answer = tkmsg.askyesno("fileman", f"Are you sure you want to delete {file}")
+            answer = tkmsg.askyesno(
+                "fileman", f"Are you sure you want to delete {file}"
+            )
             if answer:
                 if os.path.isdir(file):
                     os.rmdir(file)
