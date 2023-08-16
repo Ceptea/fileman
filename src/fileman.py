@@ -29,6 +29,7 @@ class APP:
         self.context = tk.Menu(tearoff=0)
         self.context.add_command(label="Open", command=self.open_file)
         self.context.add_command(label="Edit", command=self.edit_file)
+        self.context.add_command(label="Rename", command=self.rename_file)
         self.context.add_command(label="New file", command=self.new_file)
         self.context.add_command(label="New folder", command=self.new_folder)
         self.context.add_command(label="Delete", command=self.delete_file)
@@ -69,6 +70,13 @@ class APP:
         if os.path.isfile(file):
             self.run_file(file, f"{text_editor} {file}", 0)
 
+    def rename_file(self):
+        file = self.get_file()
+        new_name = simpledialog.askstring("fileman", f"Rename {file} to ?")
+
+        os.rename(file, new_name)
+        self.refresh()
+
     def new_folder(self):
         new_folder = simpledialog.askstring(title="fileman", prompt="Create a folder.")
         if new_folder:
@@ -88,8 +96,7 @@ class APP:
                     os.rmdir(file)
                 else:
                     os.remove(file)
-        else:
-            self.refresh()
+        self.refresh()
 
     def run_file(self, file, cmd, confirm=1):
         file = self.get_file()
