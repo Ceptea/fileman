@@ -3,11 +3,18 @@ import tkinter as tk
 import os
 import subprocess as sb
 import tkinter.messagebox as tkmsg
-import ttkbootstrap as ttk
 from tkinter import simpledialog
+from config import *
 
-terminal = "st"
-text_editor = "leafpad"
+try:
+    import ttkbootstrap as ttk
+
+    isthemeable = 1
+except ImportError:
+    import tkinter.ttk as ttk
+    isthemeable = 0
+    
+    
 
 
 def file_type(file):
@@ -114,8 +121,10 @@ class APP:
         self.context.unpost()
 
 
-root = ttk.Window(themename="vapor")
-
+if isthemeable:
+    root = ttk.Window(themename=theme)
+else:
+    root = tk.Tk()
 app = APP(root)
 style = ttk.Style()
 
