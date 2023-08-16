@@ -22,11 +22,11 @@ class APP:
         self.root.geometry("720x480")
         self.files = tk.Listbox()
         self.context = tk.Menu(tearoff=0)
-        self.context.add_command(label="Open.", command=self.open_file)
+        self.context.add_command(label="Open", command=self.open_file)
         self.context.add_command(label="New file", command=self.new_file)
         self.context.add_command(label="New folder", command=self.new_folder)
-        self.context.add_command(label="Delete.", command=self.delete_file)
-        self.context.add_command(label="Refresh.", command=self.refresh)
+        self.context.add_command(label="Delete", command=self.delete_file)
+        self.context.add_command(label="Refresh", command=self.refresh)
 
         self.files.bind("<Double-Button-1>", self.doubleclick)
         self.root.bind("<Button-3>", self.context_menu)
@@ -65,20 +65,16 @@ class APP:
             self.refresh()
 
     def delete_file(self):
-        file = self.files.curselection()
-        file = self.files.get(file)
-        file = str(file)
-
+        file = self.get_file()
         answer = tkmsg.askyesno("fileman", f"Are you sure you want to delete {file}")
         if answer:
             if os.path.isdir(file):
                 os.rmdir(file)
             else:
                 os.remove(file)
+
     def open_file(self, event=""):
-        file = self.files.curselection()
-        file = self.files.get(file)
-        file = str(file)
+        file = self.get_file()
         if file == "..":
             os.chdir("..")
         match file_type(file):
@@ -93,6 +89,12 @@ class APP:
             case _:
                 sb.Popen(f"xdg-open {file}", shell=1)
         self.refresh()
+
+    def get_file(self):
+        file = self.files.curselection()
+        file = self.files.get(file)
+        file = str(file)
+        return file
 
     def doubleclick(self, event):
         file = self.files.curselection()
