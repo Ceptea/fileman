@@ -72,6 +72,8 @@ class APP:
 
     def rename_file(self):
         file = self.get_file()
+        if not file:
+            return -1
         new_name = simpledialog.askstring("fileman", f"Rename {file} to ?")
 
         os.rename(file, new_name)
