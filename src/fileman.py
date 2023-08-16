@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 import tkinter as tk
 import os
 import subprocess as sb
